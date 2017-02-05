@@ -20,7 +20,7 @@ defmodule IP2Location do
 
   @api_version "8.0.3"
   @doc """
-    Returns supported API version for binary file
+  Returns supported API version for binary file.
   """
   def api_version do
     @api_version
@@ -28,8 +28,8 @@ defmodule IP2Location do
 
   defmodule Database do
     @moduledoc """
-      Struct for storing a database. It stores the parsed headers and the whole binary
-      itself.
+    Struct for storing a database. It stores the parsed headers and the whole binary
+    itself.
     """
 
     @type t :: %__MODULE__{}
@@ -45,13 +45,13 @@ defmodule IP2Location do
   alias IP2Location.Database
 
   @doc """
-    Parses a database header and returns an struct with all needed settings
-    for querying it later.
+  Parses a database header and returns an struct with all needed settings
+  for querying it later.
 
-    Raises ArgumentError if given a invalid raw binary
+  Raises ArgumentError if given a invalid raw binary
 
-    ## Examples
-    
+  ## Examples
+  
       iex> raw = File.read!("path/to/database.bin")
       << 5, 6, ...>>
 
@@ -83,12 +83,12 @@ defmodule IP2Location do
   end
 
   @doc """
-    Shortcut for loading and parsing a database file.
+  Shortcut for loading and parsing a database file.
 
-    Raises if given a invalid raw binary or if there is an error
-    reading the file into memory
+  Raises if given a invalid raw binary or if there is an error
+  reading the file into memory
 
-    ## Examples
+  ## Examples
 
       iex> db = IP2Location.open_database!("path/to/database.bin")
       %IP2Location.Database{...}
@@ -99,9 +99,9 @@ defmodule IP2Location do
 
   defmodule Record do
     @moduledoc """
-      Struct representing a record in the location database. Includes all
-      fields made available by the database, plus the IP range from where
-      the data was found.
+    Struct representing a record in the location database. Includes all
+    fields made available by the database, plus the IP range from where
+    the data was found.
     """
 
     @type t :: %__MODULE__{}
@@ -122,13 +122,13 @@ defmodule IP2Location do
 	@base_ipv4_to 281474976710655
 
   @doc """
-    Attempts to find a valid entry for a given IP address. If no entry is found
-    in the database, it still returns a unitialized struct.
+  Attempts to find a valid entry for a given IP address. If no entry is found
+  in the database, it still returns a unitialized struct.
 
-    Returns `{:error, error_message}` if the given IP address is mal-formed.
-    
-    ## Examples
-    
+  Returns `{:error, error_message}` if the given IP address is mal-formed.
+  
+  ## Examples
+  
       iex> %IP2Location.Record{city: city} = IP2Location.query(db, "12.166.16.221"); city
       "Indianapolis"
       

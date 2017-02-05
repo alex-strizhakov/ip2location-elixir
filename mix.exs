@@ -2,12 +2,32 @@ defmodule IP2Location.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :IP2Location,
-     version: "0.1.0",
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :ip2location,
+      version: "0.1.0",
+      elixir: "~> 1.4",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+    
+      # package info
+      package: [
+        name: "ip2location-elixir",
+        licenses: ["LGPLv3"],
+        links: %{
+          "GitHub" => "https://github.com/danielgracia/ip2location-elixir",
+          "Docs" => "https://hexdocs.pm/ip2location-elixir"
+        }
+      ],
+
+      # doc info
+      name: "IP2Location-Elixir",
+      source_url: "https://github.com/danielgracia/ip2location-elixir",
+      homepage_url: "https://github.com/danielgracia/ip2location-elixir",
+      docs: [
+        main: "IP2Location"
+      ]
+    ]
   end
 
   # Configuration for the OTP application
@@ -15,7 +35,7 @@ defmodule IP2Location.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
-    [extra_applications: [:logger]]
+    []
   end
 
   # Dependencies can be Hex packages:
@@ -28,6 +48,6 @@ defmodule IP2Location.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [{:ex_doc, "~> 0.14", only: :dev}]
   end
 end

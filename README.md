@@ -17,11 +17,11 @@ with three main differences:
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `IP2Location` to your list of dependencies in `mix.exs`:
+by adding `ip2location_elixir` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:IP2Location, "~> 0.1.0"}]
+  [{:ip2location_elixir, "~> 0.1.0"}]
 end
 ```
 

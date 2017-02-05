@@ -12,16 +12,18 @@ defmodule IP2Location.Mixfile do
     
       # package info
       package: [
-        name: "ip2location-elixir",
+        name: "ip2location_elixir",
         licenses: ["LGPLv3"],
         links: %{
           "GitHub" => "https://github.com/danielgracia/ip2location-elixir",
           "Docs" => "https://hexdocs.pm/ip2location-elixir"
-        }
+        },
+        maintainers: ["Daniel Gracia"]
       ],
 
       # doc info
       name: "IP2Location-Elixir",
+      description: "Interface for accessing IP2Location Binary Format databases.",
       source_url: "https://github.com/danielgracia/ip2location-elixir",
       homepage_url: "https://github.com/danielgracia/ip2location-elixir",
       docs: [

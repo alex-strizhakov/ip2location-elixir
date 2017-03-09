@@ -16,12 +16,12 @@ with three main differences:
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ip2location_elixir` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `ip2location_elixir` to your list of dependencies in `mix.exs`.
+As of now, this library does not set a OTP application, so you have to tell Mix that when building your project:
 
 ```elixir
 def deps do
-  [{:ip2location_elixir, "~> 0.1.0"}]
+  [{:ip2location_elixir, "~> 0.1.0", app: false}]
 end
 ```
 

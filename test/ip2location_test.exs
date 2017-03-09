@@ -13,7 +13,7 @@ defmodule IP2LocationTest do
 
   # Needs sample database in etc/db folder
   test "that it works somewhat" do
-    db = IP2Location.open_database!(File.cwd! <> "/etc/db/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE-SAMPLE.BIN")
+    db = IP2Location.open_database!(File.cwd! <> "/etc/db/db24-sample.bin")
     assert IP2Location.query(db, @test_ip) == @test_location
   end
 end

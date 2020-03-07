@@ -34,12 +34,19 @@ defmodule IP2Location do
 
     @type t :: %__MODULE__{}
     defstruct [
-      :type, :column,
-      :ipv4_count, :ipv4_addr, :ipv4_index_addr,
-      :ipv6_count, :ipv6_addr, :ipv6_index_addr,
-      :ipv4_column_size, :ipv6_column_size,
-      :input # raw binary
-    ] 
+      :type,
+      :column,
+      :ipv4_count,
+      :ipv4_addr,
+      :ipv4_index_addr,
+      :ipv6_count,
+      :ipv6_addr,
+      :ipv6_index_addr,
+      :ipv4_column_size,
+      :ipv6_column_size,
+      # raw binary
+      :input
+    ]
   end
 
   alias IP2Location.Database
@@ -51,25 +58,36 @@ defmodule IP2Location do
   Raises ArgumentError if given a invalid raw binary
 
   ## Examples
-  
+
       iex> raw = File.read!("path/to/database.bin")
       << 5, 6, ...>>
 
       iex> db = IP2Location.read_database(raw)
       %IP2Location.Database{...}
   """
-  def read_database <<
-    type::little-8, column::little-8,
-    _year::little-8, _month::little-8, _day::little-8,
-    ipv4_count::little-32, ipv4_addr::little-32,
-    ipv6_count::little-32, ipv6_addr::little-32,
-    ipv4_index_addr::little-32, ipv6_index_addr::little-32,
-    _::binary >> = input
-  do
+  def read_database(
+        <<
+          type::little-8,
+          column::little-8,
+          _year::little-8,
+          _month::little-8,
+          _day::little-8,
+          ipv4_count::little-32,
+          ipv4_addr::little-32,
+          ipv6_count::little-32,
+          ipv6_addr::little-32,
+          ipv4_index_addr::little-32,
+          ipv6_index_addr::little-32,
+          _::binary
+        >> = input
+      ) do
     %Database{
-      type: type, column: column,
-      ipv4_count: ipv4_count, ipv4_addr: ipv4_addr,
-      ipv6_count: ipv6_count, ipv6_addr: ipv6_addr,
+      type: type,
+      column: column,
+      ipv4_count: ipv4_count,
+      ipv4_addr: ipv4_addr,
+      ipv6_count: ipv6_count,
+      ipv6_addr: ipv6_addr,
       ipv4_index_addr: ipv4_index_addr,
       ipv6_index_addr: ipv6_index_addr,
       ipv4_column_size: bsl(column, 2),
@@ -79,7 +97,7 @@ defmodule IP2Location do
   end
 
   def read_database(any) do
-    raise ArgumentError, message: "Invalid format for database: #{inspect any}"
+    raise ArgumentError, message: "Invalid format for database: #{inspect(any)}"
   end
 
   @doc """
@@ -105,57 +123,100 @@ defmodule IP2Location do
     """
 
     @type t :: %__MODULE__{}
-    defstruct [
-      area_code: "-", city: "-", country_short: "-",
-      country_long: "-", domain: "-", elevation: 0.0, idd_code: "-",
-      isp: "-", latitude: 0.0, longitude: 0.0, mcc: "-", mnc: "-",
-      mobile_brand: "-", netspeed: "-", region: "-", timezone: "-",
-      usage_type: "-", weatherstation_code: "-",
-      weatherstation_name: "-", zipcode: "-",
-      ip_from: 0, ip_to: 0
-    ]
+    defstruct area_code: "-",
+              city: "-",
+              country_short: "-",
+              country_long: "-",
+              domain: "-",
+              elevation: 0.0,
+              idd_code: "-",
+              isp: "-",
+              latitude: 0.0,
+              longitude: 0.0,
+              mcc: "-",
+              mnc: "-",
+              mobile_brand: "-",
+              netspeed: "-",
+              region: "-",
+              timezone: "-",
+              usage_type: "-",
+              weatherstation_code: "-",
+              weatherstation_name: "-",
+              zipcode: "-",
+              ip_from: 0,
+              ip_to: 0
   end
 
   alias IP2Location.Record
 
-  @base_ipv4_from 281470681743360
-	@base_ipv4_to 281474976710655
+  @base_ipv4_from 281_470_681_743_360
+  @base_ipv4_to 281_474_976_710_655
 
   @doc """
   Attempts to find a valid entry for a given IP address. If no entry is found
   in the database, it still returns a unitialized struct.
 
   Returns `{:error, error_message}` if the given IP address is mal-formed.
-  
+
   ## Examples
-  
+
       iex> %IP2Location.Record{city: city} = IP2Location.query(db, "12.166.16.221"); city
       "Indianapolis"
-      
+
       iex> IP2Location.query(db, "not a IP")
       {:error, "Invalid IP address."}
   """
   def query(db = %Database{}, ip) when is_binary(ip),
     do: query(db, to_charlist(ip))
+
   def query(db = %Database{}, ip) do
     case :inet.parse_address(ip) do
       {:ok, {a, b, c, d}} ->
         ip_number = bsl(a, 24) + bsl(b, 16) + bsl(c, 8) + d
-        search(db.input, ip_number, db.type, 0, db.ipv4_count,
-          db.ipv4_addr, db.ipv4_index_addr, db.ipv4_column_size, :ipv4)
-      
+
+        search(
+          db.input,
+          ip_number,
+          db.type,
+          0,
+          db.ipv4_count,
+          db.ipv4_addr,
+          db.ipv4_index_addr,
+          db.ipv4_column_size,
+          :ipv4
+        )
+
       {:ok, {a, b, c, d, e, f, g, h}} ->
-        ip_number = bsl(a, 112) + bsl(b, 96) + bsl(c, 80) + bsl(d, 64) +
-           bsl(e, 48) + bsl(f, 32) + bsl(g, 16) + h
+        ip_number =
+          bsl(a, 112) + bsl(b, 96) + bsl(c, 80) + bsl(d, 64) +
+            bsl(e, 48) + bsl(f, 32) + bsl(g, 16) + h
+
         if ip_number >= @base_ipv4_from && ip_number <= @base_ipv4_to do
-          search(db.input, ip_number - @base_ipv4_from, db.type, 0,
-            db.ipv4_count, db.ipv4_addr, db.ipv4_index_addr,
-            db.ipv4_column_size, :ipv4)
+          search(
+            db.input,
+            ip_number - @base_ipv4_from,
+            db.type,
+            0,
+            db.ipv4_count,
+            db.ipv4_addr,
+            db.ipv4_index_addr,
+            db.ipv4_column_size,
+            :ipv4
+          )
         else
-          search(db.input, ip_number, db.type, 0, db.ipv6_count,
-            db.ipv6_addr, db.ipv6_index_addr, db.ipv6_column_size, :ipv6)
+          search(
+            db.input,
+            ip_number,
+            db.type,
+            0,
+            db.ipv6_count,
+            db.ipv6_addr,
+            db.ipv6_index_addr,
+            db.ipv6_column_size,
+            :ipv6
+          )
         end
-      
+
       _error ->
         {:error, "Invalid IP address."}
     end
@@ -163,7 +224,8 @@ defmodule IP2Location do
 
   # {shift, size}
   @ip_type_metadata %{
-    ipv4: 32, ipv6: 128
+    ipv4: 32,
+    ipv6: 128
   }
 
   for {ip_type, size} <- @ip_type_metadata do
@@ -171,20 +233,54 @@ defmodule IP2Location do
     read_function = :"read_uint#{size}"
     extra_offset = if ip_type == :ipv6, do: 12, else: 0
 
-    defp search(input, ip_number, db_type, low, high, base_address, index_base_address, column_size, unquote(ip_type)) do
+    defp search(
+           input,
+           ip_number,
+           db_type,
+           low,
+           high,
+           base_address,
+           index_base_address,
+           column_size,
+           unquote(ip_type)
+         ) do
       if index_base_address > 0 do
         index_position = bsl(bsr(ip_number, unquote(size - 16)), 3) + index_base_address
         better_low = read_uint32(input, index_position)
         better_high = read_uint32(input, index_position + 4)
-        unquote(search_tree_function)(input, ip_number, db_type, better_low, better_high, base_address, column_size)
+
+        unquote(search_tree_function)(
+          input,
+          ip_number,
+          db_type,
+          better_low,
+          better_high,
+          base_address,
+          column_size
+        )
       else
-        unquote(search_tree_function)(input, ip_number, db_type, low, high, base_address, column_size)
-      end  
+        unquote(search_tree_function)(
+          input,
+          ip_number,
+          db_type,
+          low,
+          high,
+          base_address,
+          column_size
+        )
+      end
     end
 
-    defp unquote(search_tree_function)(input, ip_number, db_type, low, high, base_address, column_size)
-      when low <= high
-    do
+    defp unquote(search_tree_function)(
+           input,
+           ip_number,
+           db_type,
+           low,
+           high,
+           base_address,
+           column_size
+         )
+         when low <= high do
       mid = bsr(low + high, 1)
       row_offset_from = base_address + mid * column_size
       row_offset_to = row_offset_from + column_size
@@ -194,10 +290,28 @@ defmodule IP2Location do
       cond do
         ip_number >= ip_from && ip_number < ip_to ->
           read_record(input, db_type + 1, row_offset_from + unquote(extra_offset), ip_from, ip_to)
+
         ip_number < ip_from ->
-          unquote(search_tree_function)(input, ip_number, db_type, low, mid - 1, base_address, column_size)
+          unquote(search_tree_function)(
+            input,
+            ip_number,
+            db_type,
+            low,
+            mid - 1,
+            base_address,
+            column_size
+          )
+
         true ->
-          unquote(search_tree_function)(input, ip_number, db_type, mid + 1, high, base_address, column_size)
+          unquote(search_tree_function)(
+            input,
+            ip_number,
+            db_type,
+            mid + 1,
+            high,
+            base_address,
+            column_size
+          )
       end
     end
 
@@ -206,7 +320,7 @@ defmodule IP2Location do
 
   defp read_record(input, type, row_offset, ip_from, ip_to) do
     {country_short, country_long} = read_column(input, type, :country, row_offset)
-    
+
     %Record{
       country_long: country_long,
       country_short: country_short,
@@ -228,7 +342,8 @@ defmodule IP2Location do
       mobile_brand: read_column(input, type, :mobile_brand, row_offset),
       elevation: read_column(input, type, :elevation, row_offset),
       usage_type: read_column(input, type, :usage_type, row_offset),
-      ip_from: ip_from, ip_to: ip_to
+      ip_from: ip_from,
+      ip_to: ip_to
     }
   end
 end

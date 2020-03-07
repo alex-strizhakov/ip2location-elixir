@@ -21,3 +21,5 @@ erl_crash.dump
 
 # Ignore test data
 /etc/db
+
+/.elixir_ls
